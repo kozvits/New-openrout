@@ -11,6 +11,10 @@ on:
 jobs:
   ai-generate-build:
     runs-on: ubuntu-latest
+    env:
+      # ✅ Ключ берётся ТОЛЬКО из Secrets. Никогда не вставляйте сырой ключ в YAML!
+      OPENROUTER_API_KEY: ${{ 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 }}
+      PROMPT_TEXT: ${{ github.event.inputs.prompt }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,40 +29,58 @@ jobs:
 
       - name: Генерация кода (OpenRouter)
         id: ai
-        env:
-          OPENROUTER_API_KEY: ${{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}}
         run: |
-          CLEAN_PROMPT=$(echo '${{ inputs.prompt }}' | sed -e 's/"/\\"/g')
-          SYSTEM="Ты — Senior Android Developer. Возвращай ТОЛЬКО валидный JSON. Формат: {\"files\":[{\"path\":\"app/src/main/...\",\"content\":\"...\"}]}. Никакого маркдауна, пояснений или текста вне JSON."
+          # Безопасная передача промта через env, а не inline-подстановку
+          echo "Промт получен. Отправляю в OpenRouter..."
           
-          RES=$(curl -s https://openrouter.ai/api/v1/chat/completions \
+          PAYLOAD=$(cat <<EOF
+          {
+            "model": "qwen/qwen3.6-plus-preview:free",
+            "messages": [
+              {
+                "role": "system",
+                "content": "Ты — Senior Android Developer. Возвращай ТОЛЬКО валидный JSON. Формат: {\"files\":[{\"path\":\"app/src/main/...\",\"content\":\"...\"}]}. Никакого маркдауна, пояснений или текста вне JSON."
+              },
+              {
+                "role": "user",
+                "content": "${PROMPT_TEXT}"
+              }
+            ],
+            "max_tokens": 4096,
+            "temperature": 0.2,
+            "response_format": { "type": "json_object" }
+          }
+          EOF
+          )
+          
+          RES=$(curl -s --fail-with-body https://openrouter.ai/api/v1/chat/completions \
             -H "Authorization: Bearer $OPENROUTER_API_KEY" \
             -H "Content-Type: application/json" \
             -H "HTTP-Referer: https://github.com/${{ github.repository }}" \
             -H "X-Title: GitHub-Android-AI" \
-            -d "{
-              \"model\": \"anthropic/claude-3-5-sonnet:20241022\",
-              \"messages\": [
-                {\"role\":\"system\",\"content\":\"$SYSTEM\"},
-                {\"role\":\"user\",\"content\":\"$CLEAN_PROMPT\"}
-              ],
-              \"max_tokens\": 4096,
-              \"temperature\": 0.2,
-              \"response_format\": {\"type\": \"json_object\"}
-            }")
+            -d "$PAYLOAD")
           
-          echo "$RES" > raw.json
-          # Удаляем возможные markdown-обёртки ```json ... ```
+          echo "$RES" > raw_response.json
+          echo "Ответ получен. Распаковываю файлы..."
+          
           python3 -c "
-          import json, sys, re
-          raw = open('raw.json').read()
-          clean = re.sub(r'^```(?:json)?\s*|\s*```$', '', raw.strip(), flags=re.MULTILINE)
-          data = json.loads(clean)
-          for f in data['files']:
-              import os
-              os.makedirs(os.path.dirname(f['path']), exist_ok=True)
-              with open(f['path'], 'w', encoding='utf-8') as out: out.write(f['content'])
-          " || echo "⚠️ Ошибка парсинга JSON AI"
+          import json, os, re, sys
+          try:
+              raw = open('raw_response.json', 'r', encoding='utf-8').read()
+              # Убираем возможные markdown-обёртки ```json ... ```
+              clean = re.sub(r'^```(?:json)?\s*|\s*```$', '', raw.strip(), flags=re.MULTILINE)
+              data = json.loads(clean)
+              for f in data.get('files', []):
+                  path = f['path']
+                  content = f['content']
+                  os.makedirs(os.path.dirname(path), exist_ok=True)
+                  with open(path, 'w', encoding='utf-8') as out:
+                      out.write(content)
+              print(f'✅ Создано {len(data[\"files\"])} файлов')
+          except Exception as e:
+              print(f'❌ Ошибка парсинга: {e}')
+              sys.exit(1)
+          "
 
       - name: Коммит и создание ветки
         run: |
@@ -67,8 +89,11 @@ jobs:
           git config user.email "bot@github.com"
           git checkout -b "$BRANCH"
           git add -A
-          [ -z "$(git diff --cached --name-only)" ] && echo "Нет изменений для коммита" && exit 0
-          git commit -m "🤖 AI: ${{ inputs.prompt }}"
+          if git diff --cached --quiet; then
+            echo "⚠️ AI не сгенерировал новых файлов"
+            exit 1
+          fi
+          git commit -m "🤖 AI: ${PROMPT_TEXT}"
           git push origin "$BRANCH"
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
@@ -76,16 +101,19 @@ jobs:
         run: |
           chmod +x gradlew 2>/dev/null || true
           ./gradlew assembleDebug --no-daemon --console=plain 2>&1 | tee build.log
-          echo "EXIT=$?" >> $GITHUB_ENV
+          echo "EXIT_CODE=$?" >> $GITHUB_ENV
 
       - name: Создание PR
         if: env.BRANCH != ''
         run: |
-          STATUS="✅"
-          [ "$EXIT" != "0" ] && STATUS="❌ Сборка упала. См. артефакты build.log"
+          if [ "$EXIT_CODE" = "0" ]; then
+            STATUS="✅ Сборка прошла успешно"
+          else
+            STATUS="❌ Ошибка сборки. Проверьте вкладку Checks или артефакты."
+          fi
           gh pr create \
-            --title "🤖 AI Task: ${{ inputs.prompt }}" \
-            --body "Автосборка: $STATUS\n\nЛоги прикреплены в Actions." \
+            --title "🤖 AI Task: ${PROMPT_TEXT:0:50}..." \
+            --body "$STATUS\n\nЛоги сборки доступны в Actions." \
             --base main --head "$BRANCH"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
