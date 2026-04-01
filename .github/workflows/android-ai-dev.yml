@@ -1,0 +1,91 @@
+name: Android AI Dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: "Промт для генерации/доработки"
+        required: true
+        type: string
+
+jobs:
+  ai-generate-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Java & Gradle
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/gradle-build-action@v3
+
+      - name: Генерация кода (OpenRouter)
+        id: ai
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          CLEAN_PROMPT=$(echo '${{ inputs.prompt }}' | sed -e 's/"/\\"/g')
+          SYSTEM="Ты — Senior Android Developer. Возвращай ТОЛЬКО валидный JSON. Формат: {\"files\":[{\"path\":\"app/src/main/...\",\"content\":\"...\"}]}. Никакого маркдауна, пояснений или текста вне JSON."
+          
+          RES=$(curl -s https://openrouter.ai/api/v1/chat/completions \
+            -H "Authorization: Bearer $OPENROUTER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -H "HTTP-Referer: https://github.com/${{ github.repository }}" \
+            -H "X-Title: GitHub-Android-AI" \
+            -d "{
+              \"model\": \"anthropic/claude-3-5-sonnet:20241022\",
+              \"messages\": [
+                {\"role\":\"system\",\"content\":\"$SYSTEM\"},
+                {\"role\":\"user\",\"content\":\"$CLEAN_PROMPT\"}
+              ],
+              \"max_tokens\": 4096,
+              \"temperature\": 0.2,
+              \"response_format\": {\"type\": \"json_object\"}
+            }")
+          
+          echo "$RES" > raw.json
+          # Удаляем возможные markdown-обёртки ```json ... ```
+          python3 -c "
+          import json, sys, re
+          raw = open('raw.json').read()
+          clean = re.sub(r'^```(?:json)?\s*|\s*```$', '', raw.strip(), flags=re.MULTILINE)
+          data = json.loads(clean)
+          for f in data['files']:
+              import os
+              os.makedirs(os.path.dirname(f['path']), exist_ok=True)
+              with open(f['path'], 'w', encoding='utf-8') as out: out.write(f['content'])
+          " || echo "⚠️ Ошибка парсинга JSON AI"
+
+      - name: Коммит и создание ветки
+        run: |
+          BRANCH="ai/gen-${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "bot@github.com"
+          git checkout -b "$BRANCH"
+          git add -A
+          [ -z "$(git diff --cached --name-only)" ] && echo "Нет изменений для коммита" && exit 0
+          git commit -m "🤖 AI: ${{ inputs.prompt }}"
+          git push origin "$BRANCH"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+
+      - name: Сборка Android (Debug)
+        run: |
+          chmod +x gradlew 2>/dev/null || true
+          ./gradlew assembleDebug --no-daemon --console=plain 2>&1 | tee build.log
+          echo "EXIT=$?" >> $GITHUB_ENV
+
+      - name: Создание PR
+        if: env.BRANCH != ''
+        run: |
+          STATUS="✅"
+          [ "$EXIT" != "0" ] && STATUS="❌ Сборка упала. См. артефакты build.log"
+          gh pr create \
+            --title "🤖 AI Task: ${{ inputs.prompt }}" \
+            --body "Автосборка: $STATUS\n\nЛоги прикреплены в Actions." \
+            --base main --head "$BRANCH"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
