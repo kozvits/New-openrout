@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/taskListFragment"
+        android:icon="@drawable/ic_tasks"
+        android:title="@string/nav_tasks" />
+    <item
+        android:id="@+id/hotListFragment"
+        android:icon="@drawable/ic_fire"
+        android:title="@string/hot_list" />
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/nav_settings" />
+</menu>

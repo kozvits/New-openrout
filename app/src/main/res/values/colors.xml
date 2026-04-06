@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ── Backgrounds ── -->
+    <color name="bg_primary">#0D0D0D</color>
+    <color name="bg_surface">#1A1A2E</color>
+    <color name="bg_card">#16213E</color>
+    <color name="bg_widget">#0D0D0D</color>
+
+    <!-- ── Text ── -->
+    <color name="text_primary">#ECEFF1</color>
+    <color name="text_secondary">#90A4AE</color>
+    <color name="text_hint">#546E7A</color>
+
+    <!-- ── Accents ── -->
+    <color name="accent_purple">#9C7FFF</color>
+    <color name="accent_purple_dark">#7B5FD9</color>
+    <color name="accent_teal">#26C6DA</color>
+    <color name="accent_teal_dark">#0097A7</color>
+    <color name="accent_yellow">#FFD600</color>
+
+    <!-- ── Priority colours ── -->
+    <color name="priority_top">#FF5252</color>
+    <color name="priority_high">#FF7043</color>
+    <color name="priority_medium">#FFC107</color>
+    <color name="priority_low">#66BB6A</color>
+    <color name="priority_none">#455A64</color>
+
+    <!-- ── Chips ── -->
+    <color name="chip_folder_bg">#1F2B4A</color>
+    <color name="chip_context_bg">#1A3040</color>
+
+    <!-- ── Navigation ── -->
+    <color name="nav_active">#9C7FFF</color>
+    <color name="nav_inactive">#546E7A</color>
+
+    <!-- ── Divider ── -->
+    <color name="divider">#1E2D40</color>
+
+    <!-- ── Overdue ── -->
+    <color name="overdue">#FF5252</color>
+
+    <!-- ── Material required ── -->
+    <color name="colorPrimary">#9C7FFF</color>
+    <color name="colorPrimaryDark">#7B5FD9</color>
+    <color name="colorAccent">#26C6DA</color>
+</resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Toodledo Organiser</string>
+
+    <!-- Navigation -->
+    <string name="nav_tasks">Tasks</string>
+    <string name="nav_hot_list">Hot List</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Task list -->
+    <string name="all_tasks">All Tasks</string>
+    <string name="no_tasks">All done! 🎉</string>
+    <string name="add_task">Add task</string>
+    <string name="search_hint">Search tasks…</string>
+    <string name="filter_by_folder">Filter by Folder</string>
+    <string name="filter_by_context">Filter by Context</string>
+    <string name="task_completed">Task completed ✓</string>
+    <string name="task_deleted">Task deleted</string>
+    <string name="tasks">tasks</string>
+
+    <!-- Edit task -->
+    <string name="new_task">New Task</string>
+    <string name="edit_task">Edit Task</string>
+    <string name="task_title">Title *</string>
+    <string name="task_note">Notes</string>
+    <string name="task_saved">Task saved</string>
+    <string name="section_scheduling">SCHEDULING</string>
+    <string name="section_organization">ORGANIZATION</string>
+    <string name="section_flags">FLAGS</string>
+    <string name="due_date">Due Date</string>
+    <string name="start_date">Start Date</string>
+    <string name="no_date">No date</string>
+    <string name="repeat">Repeat</string>
+    <string name="priority">Priority</string>
+    <string name="status">Status</string>
+    <string name="folder">Folder</string>
+    <string name="context">Context</string>
+    <string name="tags">Tags (comma separated)</string>
+    <string name="starred">Starred ⭐</string>
+    <string name="hot_list">Hot List 🔥</string>
+    <string name="no_folder">— No Folder —</string>
+    <string name="no_context">— No Context —</string>
+
+    <!-- Hot list -->
+    <string name="hot_list_empty">No hot tasks.\nStar a task and enable Hot List 🔥</string>
+    <string name="sort_by">SORT BY</string>
+    <string name="sort_primary">1st</string>
+    <string name="sort_secondary">2nd</string>
+    <string name="sort_tertiary">3rd</string>
+    <string name="sort_none">None</string>
+
+    <!-- Settings -->
+    <string name="sync_status">SYNC STATUS</string>
+    <string name="last_sync">Last sync: %1$s</string>
+    <string name="never_synced">Never synced</string>
+    <string name="syncing">Syncing…</string>
+    <string name="sync_success">Sync successful ✓</string>
+    <string name="sync_error">Sync error: %1$s</string>
+    <string name="sync_now">Sync Now</string>
+    <string name="auto_sync">AUTO-SYNC</string>
+    <string name="enable_auto_sync">Enable automatic sync</string>
+    <string name="sync_interval">Interval</string>
+    <string name="toodledo_account">TOODLEDO ACCOUNT</string>
+    <string name="api_login">Login (email)</string>
+    <string name="api_password">Password</string>
+    <string name="save_settings">Save Settings</string>
+    <string name="settings_saved">Settings saved ✓</string>
+
+    <!-- Actions -->
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+</resources>

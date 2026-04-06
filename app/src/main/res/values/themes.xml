@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.ToodledoOrganiser" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/accent_purple</item>
+        <item name="colorPrimaryDark">@color/accent_purple_dark</item>
+        <item name="colorAccent">@color/accent_teal</item>
+        <item name="android:windowBackground">@color/bg_primary</item>
+        <item name="android:statusBarColor">@color/bg_surface</item>
+        <item name="android:navigationBarColor">@color/bg_surface</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.ToodledoOrganiser.Dialog</item>
+    </style>
+
+    <!-- Dialog overlay -->
+    <style name="ThemeOverlay.ToodledoOrganiser.Dialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:background">@color/bg_surface</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.ToodledoOrganiser.ButtonText</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.ToodledoOrganiser.ButtonText</item>
+    </style>
+
+    <!-- Popup menu (SearchView, Spinner drop-down) -->
+    <style name="ThemeOverlay.ToodledoOrganiser.Popup" parent="ThemeOverlay.MaterialComponents.Light">
+        <item name="android:colorBackground">@color/bg_surface</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+    </style>
+
+    <!-- TextInputLayout dark style -->
+    <style name="Widget.ToodledoOrganiser.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/accent_purple</item>
+        <item name="hintTextColor">@color/accent_teal</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+        <item name="boxBackgroundColor">@color/bg_surface</item>
+    </style>
+
+    <!-- Primary filled button -->
+    <style name="Widget.ToodledoOrganiser.ButtonPrimary" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/accent_purple</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <!-- Outlined button -->
+    <style name="Widget.ToodledoOrganiser.ButtonOutline" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/accent_purple</item>
+        <item name="android:textColor">@color/accent_purple</item>
+        <item name="cornerRadius">6dp</item>
+    </style>
+
+    <!-- Text-only button -->
+    <style name="Widget.ToodledoOrganiser.ButtonText" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/accent_teal</item>
+    </style>
+
+</resources>

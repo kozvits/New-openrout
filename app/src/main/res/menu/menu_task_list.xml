@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_search"
+        android:title="Search"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+    <item
+        android:id="@+id/action_filter_folder"
+        android:title="Filter by Folder"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_filter_context"
+        android:title="Filter by Context"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_show_completed"
+        android:title="Show Completed"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_clear_filter"
+        android:title="Clear Filter"
+        app:showAsAction="never" />
+</menu>
